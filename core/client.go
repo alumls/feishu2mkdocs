@@ -6,6 +6,7 @@ import (
 	//"fmt"
 
 	lark "github.com/larksuite/oapi-sdk-go/v3"
+	larkdocx "github.com/larksuite/oapi-sdk-go/v3/service/docx/v1"
 	larkwiki "github.com/larksuite/oapi-sdk-go/v3/service/wiki/v2"
 )
 
@@ -63,4 +64,44 @@ func (c *Client) GetWikiNodeList(ctx context.Context, spaceId string, parentNode
 	//fmt.Println(utils.PrettyPrint(nodes))
 
 	return nodes, nil
+}
+
+func (c *Client) GetDocumentBlockAll(ctx context.Context, documentId string) ([]*larkdocx.Block, error) {
+
+	req := larkdocx.NewListDocumentBlockReqBuilder().
+		PageSize(2).
+		DocumentId(documentId).
+		DocumentRevisionId(-1).
+		Build()
+
+	resp, err := c.larkClient.Docx.V1.DocumentBlock.List(context.Background(), req)
+
+	if err != nil {
+		return nil, err
+	}
+
+	blocks := resp.Data.Items
+	previousPageToken := ""
+
+	for *resp.Data.HasMore && previousPageToken != *resp.Data.PageToken {
+		previousPageToken = *resp.Data.PageToken
+		req := larkdocx.NewListDocumentBlockReqBuilder().
+			DocumentId(documentId).
+			PageToken(*resp.Data.PageToken).
+			DocumentRevisionId(-1).
+			Build()
+
+		resp, err := c.larkClient.Docx.V1.DocumentBlock.List(context.Background(), req)
+
+		if err != nil {
+			return nil, err
+		}
+
+		blocks = append(blocks, resp.Data.Items...)
+	}
+
+	// 打印测试
+	//fmt.Println(utils.PrettyPrint(blocks))
+
+	return blocks, nil
 }

@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	parentNodeToken := "Tfehw6XAciPJn6kcZEgc59fEn7e"
+	//parentNodeToken := ""
 	client := core.NewClient("cli_a877a088c478500c", "vVUcx8YentVNvUYM7UA75d1LbIR7eAgX")
-	nodes, err := client.GetWikiNodeList(context.Background(), "7565233961329246212", &parentNodeToken)
+	nodes, err := client.GetDocumentBlockAll(context.Background(), "GOWNd16b4oGagxxbxvZcK1pEnZe")
 	if err != nil {
 		fmt.Println(err)
 		return
