@@ -2,8 +2,8 @@ package core
 
 import (
 	"context"
-	"feishu2mkdocs/utils"
-	"fmt"
+	//"feishu2mkdocs/utils"
+	//"fmt"
 
 	lark "github.com/larksuite/oapi-sdk-go/v3"
 	larkwiki "github.com/larksuite/oapi-sdk-go/v3/service/wiki/v2"
@@ -22,12 +22,11 @@ func NewClient(appId, appSecret string) *Client {
 	}
 }
 
-func (c *Client) GetWikiNodeList(ctx context.Context, spaceId, token string) ([]*larkwiki.Node, error) {
-
+func (c *Client) GetWikiNodeList(ctx context.Context, spaceId string, parentNodetoken *string) ([]*larkwiki.Node, error) {
 	// 创建请求对象
 	req := larkwiki.NewListSpaceNodeReqBuilder().
 		SpaceId(spaceId).
-		PageToken(token).
+		ParentNodeToken(*parentNodetoken).
 		Build()
 
 	// 发送请求
@@ -39,10 +38,29 @@ func (c *Client) GetWikiNodeList(ctx context.Context, spaceId, token string) ([]
 	}
 
 	// 打印测试
-	fmt.Println(utils.PrettyPrint(resp))
+	//fmt.Println(utils.PrettyPrint(resp))
 
-	// TODO: 需要分页继续获得完整的NodeList，经过测试，子页面不会包含在List中，需要通过haschild判断后递归获取
 	nodes := resp.Data.Items
+	previousPageToken := ""
+
+	for *resp.Data.HasMore && previousPageToken != *resp.Data.PageToken {
+		previousPageToken = *resp.Data.PageToken
+		req := larkwiki.NewListSpaceNodeReqBuilder().
+			SpaceId(spaceId).
+			PageToken(*resp.Data.PageToken).
+			Build()
+
+		resp, err := c.larkClient.Wiki.V2.SpaceNode.List(context.Background(), req)
+
+		if err != nil {
+			return nil, err
+		}
+
+		nodes = append(nodes, resp.Data.Items...)
+	}
+
+	// 打印测试
+	//fmt.Println(utils.PrettyPrint(nodes))
 
 	return nodes, nil
 }
