@@ -1,0 +1,56 @@
+package core
+
+const (
+	DocxBlockTypePage              int = 1   // 文档 Block
+	DocxBlockTypeText              int = 2   // 文本 Block
+	DocxBlockTypeHeading1          int = 3   // 一级标题 Block
+	DocxBlockTypeHeading2          int = 4   // 二级标题 Block
+	DocxBlockTypeHeading3          int = 5   // 三级标题 Block
+	DocxBlockTypeHeading4          int = 6   // 四级标题 Block
+	DocxBlockTypeHeading5          int = 7   // 五级标题 Block
+	DocxBlockTypeHeading6          int = 8   // 六级标题 Block
+	DocxBlockTypeHeading7          int = 9   // 七级标题 Block
+	DocxBlockTypeHeading8          int = 10  // 八级标题 Block
+	DocxBlockTypeHeading9          int = 11  // 九级标题 Block
+	DocxBlockTypeBullet            int = 12  // 无序列表 Block
+	DocxBlockTypeOrdered           int = 13  // 有序列表 Block
+	DocxBlockTypeCode              int = 14  // 代码块 Block
+	DocxBlockTypeQuote             int = 15  // 引用 Block
+	DocxBlockTypeTodo              int = 17  // 任务 Block
+	DocxBlockTypeBitable           int = 18  // 多维表格 Block
+	DocxBlockTypeCallout           int = 19  // 高亮块 Block
+	DocxBlockTypeChatCard          int = 20  // 群聊卡片 Block
+	DocxBlockTypeDiagram           int = 21  // 流程图/UML Block
+	DocxBlockTypeDivider           int = 22  // 分割线 Block
+	DocxBlockTypeFile              int = 23  // 文件 Block
+	DocxBlockTypeGrid              int = 24  // 分栏 Block
+	DocxBlockTypeGridColumn        int = 25  // 分栏列 Block
+	DocxBlockTypeIframe            int = 26  // 内嵌 Block
+	DocxBlockTypeImage             int = 27  // 图片 Block
+	DocxBlockTypeISV               int = 28  // 三方 Block
+	DocxBlockTypeMindnote          int = 29  // 思维笔记 Block
+	DocxBlockTypeSheet             int = 30  // 电子表格 Block
+	DocxBlockTypeTable             int = 31  // 表格 Block
+	DocxBlockTypeTableCell         int = 32  // 单元格 Block
+	DocxBlockTypeView              int = 33  // 视图 Block
+	DocxBlockTypeQuoteContainer    int = 34  // 引用容器 Block
+	DocxBlockTypeTask              int = 35  // 任务 Block
+	DocxBlockTypeOkr               int = 36  // OKR Block
+	DocxBlockTypeOkrObjective      int = 37  // OKR 目标 Block
+	DocxBlockTypeOkrKeyResult      int = 38  // OKR 关键结果 Block
+	DocxBlockTypeOkrProgress       int = 39  // OKR 进展 Block
+	DocxBlockTypeAddOns            int = 40  // 新版文档小组件 Block
+	DocxBlockTypeJiraIssue         int = 41  // Jira Issue Block
+	DocxBlockTypeWikiCatalog       int = 42  // Wiki子页面 Block（旧版）
+	DocxBlockTypeBoard             int = 43  // 画板 Block
+	DocxBlockTypeAgenda            int = 44  // 议程 Block
+	DocxBlockTypeAgendaItem        int = 45  // 议程项 Block
+	DocxBlockTypeAgendaItemTitle   int = 46  // 议程项标题 Block
+	DocxBlockTypeAgendaItemContent int = 47  // 议程项内容 Block
+	DocxBlockTypeLinkPreview       int = 48  // 链接预览 Block
+	DocxBlockTypeSourceSynced      int = 49  // 源同步 Block
+	DocxBlockTypeReferenceSynced   int = 50  // 引用同步 Block
+	DocxBlockTypeSubPageList       int = 51  // Wiki 子页面列表 Block（新版）
+	DocxBlockTypeAiTemplate        int = 52  // AI 模板 Block
+	DocxBlockTypeUndefined         int = 999 // 未支持 Block
+)

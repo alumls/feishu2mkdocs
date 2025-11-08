@@ -69,7 +69,7 @@ func (c *Client) GetWikiNodeList(ctx context.Context, spaceId string, parentNode
 func (c *Client) GetDocumentBlockAll(ctx context.Context, documentId string) ([]*larkdocx.Block, error) {
 
 	req := larkdocx.NewListDocumentBlockReqBuilder().
-		PageSize(2).
+		PageSize(500).
 		DocumentId(documentId).
 		DocumentRevisionId(-1).
 		Build()

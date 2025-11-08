@@ -2,12 +2,17 @@ package core
 
 type Config struct{
 	Feishu FeishuConfig `json:"feishu"`
+	Output OutputConfig `json:"output"`
 }
 
 type FeishuConfig struct {
 	AppId     string `json:"app_id"`
 	AppSecret string `json:"app_secret"`
 	SpaceId   string `json:"space_id"`
+}
+
+type OutputConfig struct {
+	
 }
 
 //Create Config
