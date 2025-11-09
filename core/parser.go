@@ -1,8 +1,9 @@
 package core
 
 import (
-	"strings"
 	"fmt"
+	"reflect"
+	"strings"
 
 	"feishu2mkdocs/utils"
 
@@ -40,17 +41,34 @@ func (p *Parser) ParseDocxBlock(b *larkdocx.Block, indentLevel int) string {
 	case DocxBlockTypeText:
 		buf.WriteString(p.ParseDocxBlockText(b.Text))
 	case DocxBlockTypeHeading1:
+		buf.WriteString(p.ParseDocxBlockHeading(b, 1))
 	case DocxBlockTypeHeading2:
+		buf.WriteString(p.ParseDocxBlockHeading(b, 2))
 	case DocxBlockTypeHeading3:
+		buf.WriteString(p.ParseDocxBlockHeading(b, 3))
 	case DocxBlockTypeHeading4:
+		buf.WriteString(p.ParseDocxBlockHeading(b, 4))
 	case DocxBlockTypeHeading5:
+		buf.WriteString(p.ParseDocxBlockHeading(b, 5))
 	case DocxBlockTypeHeading6:
+		buf.WriteString(p.ParseDocxBlockHeading(b, 6))
 	case DocxBlockTypeHeading7:
+		buf.WriteString(p.ParseDocxBlockHeading(b, 7))
 	case DocxBlockTypeHeading8:
+		buf.WriteString(p.ParseDocxBlockHeading(b, 8))
 	case DocxBlockTypeHeading9:
+		buf.WriteString(p.ParseDocxBlockHeading(b, 9))
 	case DocxBlockTypeOrdered:
+		buf.WriteString(p.ParseDocxBlockOrdered(b, indentLevel))
 	case DocxBlockTypeBullet:
+		buf.WriteString(p.ParseDocxBlockBullet(b, indentLevel))
 	case DocxBlockTypeTodo:
+		if *b.Todo.Style.Done {
+			buf.WriteString("- [x] ")
+		} else{
+			buf.WriteString("- [ ] ")
+		}
+		buf.WriteString(p.ParseDocxBlockText(b.Todo))
 	case DocxBlockTypeCode:
 	case DocxBlockTypeQuote:
 	case DocxBlockTypeCallout:
@@ -86,6 +104,65 @@ func (p *Parser) ParseDocxBlockText(b *larkdocx.Text) string {
 		buf.WriteString(p.ParseDocxTextElement(e, inline))
 	}
 	buf.WriteString("\n")
+	return buf.String()
+}
+
+func (p *Parser) ParseDocxBlockHeading(b *larkdocx.Block, headingLevel int) string {
+	buf := new(strings.Builder)
+
+	buf.WriteString(strings.Repeat("#", headingLevel))
+	buf.WriteString(" ")
+
+	headingText := reflect.ValueOf(b).Elem().FieldByName(fmt.Sprintf("Heading%d", headingLevel))
+	buf.WriteString(p.ParseDocxBlockText(headingText.Interface().(*larkdocx.Text)))
+
+	for _, childId := range b.Children {
+		childBlock := p.blockMap[childId]
+		buf.WriteString(p.ParseDocxBlock(childBlock, 0))
+	}
+
+	return buf.String()
+}
+
+func (p *Parser) ParseDocxBlockOrdered(b *larkdocx.Block, indentLevel int) string {
+	buf := new(strings.Builder)
+
+	parent := p.blockMap[*b.ParentId]
+	order := 1
+	for idx, child := range parent.Children {
+		if child == *b.BlockId {
+			for i := idx-1; i >=0; i-- {
+				if *p.blockMap[parent.Children[i]].BlockType == DocxBlockTypeOrdered {
+					order++
+				} else {
+					break
+				}
+			}
+		}
+	}
+
+	buf.WriteString(fmt.Sprintf("%d. ", order))
+	buf.WriteString(p.ParseDocxBlockText(b.Ordered))
+
+	for _, childId := range b.Children {
+		childBlock := p.blockMap[childId]
+		buf.WriteString(p.ParseDocxBlock(childBlock, indentLevel+1))
+	}
+
+	return buf.String()
+}
+
+func (p *Parser) ParseDocxBlockBullet(b *larkdocx.Block, indentLevel int) string {
+	buf := new(strings.Builder)
+
+	buf.WriteString("- ")
+	buf.WriteString(p.ParseDocxBlockText(b.Bullet))
+
+	for _, childId := range b.Children{
+		childBlock := p.blockMap[childId]
+		buf.WriteString(p.ParseDocxBlock(childBlock, indentLevel + 1))
+	}
+
 	return buf.String()
 }
 

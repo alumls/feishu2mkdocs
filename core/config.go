@@ -1,5 +1,11 @@
 package core
 
+// Option:
+// 	- StartHeading
+// 	- MaxHeading
+// 	- TagsDetectEnable
+// 	- LogOutput
+
 type Config struct{
 	Feishu FeishuConfig `json:"feishu"`
 	Output OutputConfig `json:"output"`

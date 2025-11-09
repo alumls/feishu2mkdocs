@@ -25,11 +25,11 @@ func main() {
 	
 	parseroutput := markdown
 
-	er := os.WriteFile("output.txt", []byte(parseroutput), 0644)
+	er := os.WriteFile("md.txt", []byte(parseroutput), 0644)
     if er != nil {
         fmt.Println("写入文件失败:", er)
         return
     }
 
-    fmt.Println("输出已保存到 output.txt")
+    fmt.Println("输出已保存到 md.txt")
 }
