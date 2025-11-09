@@ -63,12 +63,7 @@ func (p *Parser) ParseDocxBlock(b *larkdocx.Block, indentLevel int) string {
 	case DocxBlockTypeBullet:
 		buf.WriteString(p.ParseDocxBlockBullet(b, indentLevel))
 	case DocxBlockTypeTodo:
-		if *b.Todo.Style.Done {
-			buf.WriteString("- [x] ")
-		} else{
-			buf.WriteString("- [ ] ")
-		}
-		buf.WriteString(p.ParseDocxBlockText(b.Todo))
+		buf.WriteString(p.ParseDocxBlockTodo(b, indentLevel))
 	case DocxBlockTypeCode:
 	case DocxBlockTypeQuote:
 	case DocxBlockTypeCallout:
@@ -159,6 +154,24 @@ func (p *Parser) ParseDocxBlockBullet(b *larkdocx.Block, indentLevel int) string
 	buf.WriteString(p.ParseDocxBlockText(b.Bullet))
 
 	for _, childId := range b.Children{
+		childBlock := p.blockMap[childId]
+		buf.WriteString(p.ParseDocxBlock(childBlock, indentLevel + 1))
+	}
+
+	return buf.String()
+}
+
+func (p *Parser) ParseDocxBlockTodo(b *larkdocx.Block, indentLevel int) string {
+	buf := new(strings.Builder)
+
+	if *b.Todo.Style.Done {
+		buf.WriteString("- [x] ")
+	} else{
+		buf.WriteString("- [ ] ")
+	}
+	buf.WriteString(p.ParseDocxBlockText(b.Todo))
+
+	for _, childId := range b.Children {
 		childBlock := p.blockMap[childId]
 		buf.WriteString(p.ParseDocxBlock(childBlock, indentLevel + 1))
 	}
