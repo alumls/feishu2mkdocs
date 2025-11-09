@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"feishu2mkdocs/core"
-	//"feishu2mkdocs/utils"
+	"feishu2mkdocs/utils"
 	"os"
 	"fmt"
 )
@@ -17,7 +17,7 @@ func main() {
 
 	//fmt.Println(utils.PrettyPrint(nodes))
 
-	//fmt.Println(utils.PrettyPrint(blocks))
+	fmt.Println(utils.PrettyPrint(blocks))
 
 	config := core.OutputConfig{}
 	parser := core.NewParser(config)

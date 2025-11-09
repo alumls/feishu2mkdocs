@@ -54,3 +54,159 @@ const (
 	DocxBlockTypeAiTemplate        int = 52  // AI 模板 Block
 	DocxBlockTypeUndefined         int = 999 // 未支持 Block
 )
+
+const (
+	DocxCodeLanguagePlainText             int = 1
+	DocxCodeLanguageABAP                  int = 2
+	DocxCodeLanguageAda                   int = 3
+	DocxCodeLanguageApache                int = 4
+	DocxCodeLanguageApex                  int = 5
+	DocxCodeLanguageAssembly              int = 6
+	DocxCodeLanguageBash                  int = 7
+	DocxCodeLanguageCSharp                int = 8
+	DocxCodeLanguageCPlusPlus             int = 9
+	DocxCodeLanguageC                     int = 10
+	DocxCodeLanguageCOBOL                 int = 11
+	DocxCodeLanguageCSS                   int = 12
+	DocxCodeLanguageCoffeeScript          int = 13
+	DocxCodeLanguageD                     int = 14
+	DocxCodeLanguageDart                  int = 15
+	DocxCodeLanguageDelphi                int = 16
+	DocxCodeLanguageDjango                int = 17
+	DocxCodeLanguageDockerfile            int = 18
+	DocxCodeLanguageErlang                int = 19
+	DocxCodeLanguageFortran               int = 20
+	DocxCodeLanguageFoxPro                int = 21
+	DocxCodeLanguageGo                    int = 22
+	DocxCodeLanguageGroovy                int = 23
+	DocxCodeLanguageHTML                  int = 24
+	DocxCodeLanguageHTMLBars              int = 25
+	DocxCodeLanguageHTTP                  int = 26
+	DocxCodeLanguageHaskell               int = 27
+	DocxCodeLanguageJSON                  int = 28
+	DocxCodeLanguageJava                  int = 29
+	DocxCodeLanguageJavaScript            int = 30
+	DocxCodeLanguageJulia                 int = 31
+	DocxCodeLanguageKotlin                int = 32
+	DocxCodeLanguageLateX                 int = 33
+	DocxCodeLanguageLisp                  int = 34
+	DocxCodeLanguageLogo                  int = 35
+	DocxCodeLanguageLua                   int = 36
+	DocxCodeLanguageMATLAB                int = 37
+	DocxCodeLanguageMakefile              int = 38
+	DocxCodeLanguageMarkdown              int = 39
+	DocxCodeLanguageNginx                 int = 40
+	DocxCodeLanguageObjective             int = 41
+	DocxCodeLanguageOpenEdgeABL           int = 42
+	DocxCodeLanguagePHP                   int = 43
+	DocxCodeLanguagePerl                  int = 44
+	DocxCodeLanguagePostScript            int = 45
+	DocxCodeLanguagePowerShell            int = 46
+	DocxCodeLanguageProlog                int = 47
+	DocxCodeLanguageProtoBuf              int = 48
+	DocxCodeLanguagePython                int = 49
+	DocxCodeLanguageR                     int = 50
+	DocxCodeLanguageRPG                   int = 51
+	DocxCodeLanguageRuby                  int = 52
+	DocxCodeLanguageRust                  int = 53
+	DocxCodeLanguageSAS                   int = 54
+	DocxCodeLanguageSCSS                  int = 55
+	DocxCodeLanguageSQL                   int = 56
+	DocxCodeLanguageScala                 int = 57
+	DocxCodeLanguageScheme                int = 58
+	DocxCodeLanguageScratch               int = 59
+	DocxCodeLanguageShell                 int = 60
+	DocxCodeLanguageSwift                 int = 61
+	DocxCodeLanguageThrift                int = 62
+	DocxCodeLanguageTypeScript            int = 63
+	DocxCodeLanguageVBScript              int = 64
+	DocxCodeLanguageVisual                int = 65
+	DocxCodeLanguageXML                   int = 66
+	DocxCodeLanguageYAML                  int = 67
+	DocxCodeLanguageCMAKE                 int = 68
+	DocxCodeLanguageDiff                  int = 69
+	DocxCodeLanguageGherkin               int = 70
+	DocxCodeLanguageGraphQL               int = 71
+	DocxCodeLanguageOpenGLShadingLanguage int = 72
+	DocxCodeLanguageProperties            int = 73
+	DocxCodeLanguageSolidity              int = 74
+	DocxCodeLanguageTOML                  int = 75
+)
+
+var DocxCodeLang2MdStr = map[int]string{
+	DocxCodeLanguagePlainText:             "",
+	DocxCodeLanguageABAP:                  "abap",
+	DocxCodeLanguageAda:                   "ada",
+	DocxCodeLanguageApache:                "apache",
+	DocxCodeLanguageApex:                  "apex",
+	DocxCodeLanguageAssembly:              "asm",
+	DocxCodeLanguageBash:                  "bash",
+	DocxCodeLanguageCSharp:                "csharp",
+	DocxCodeLanguageCPlusPlus:             "cpp",
+	DocxCodeLanguageC:                     "c",
+	DocxCodeLanguageCOBOL:                 "cobol",
+	DocxCodeLanguageCSS:                   "css",
+	DocxCodeLanguageCoffeeScript:          "coffee",
+	DocxCodeLanguageD:                     "d",
+	DocxCodeLanguageDart:                  "dart",
+	DocxCodeLanguageDelphi:                "delphi",
+	DocxCodeLanguageDjango:                "django",
+	DocxCodeLanguageDockerfile:            "docker",
+	DocxCodeLanguageErlang:                "erlang",
+	DocxCodeLanguageFortran:               "fortran",
+	DocxCodeLanguageFoxPro:                "foxpro",
+	DocxCodeLanguageGo:                    "go",
+	DocxCodeLanguageGroovy:                "groovy",
+	DocxCodeLanguageHTML:                  "html",
+	DocxCodeLanguageHTMLBars:              "htmlbars",
+	DocxCodeLanguageHTTP:                  "http",
+	DocxCodeLanguageHaskell:               "haskell",
+	DocxCodeLanguageJSON:                  "json",
+	DocxCodeLanguageJava:                  "java",
+	DocxCodeLanguageJavaScript:            "javascript",
+	DocxCodeLanguageJulia:                 "julia",
+	DocxCodeLanguageKotlin:                "kotlin",
+	DocxCodeLanguageLateX:                 "latex",
+	DocxCodeLanguageLisp:                  "lisp",
+	DocxCodeLanguageLogo:                  "logo",
+	DocxCodeLanguageLua:                   "lua",
+	DocxCodeLanguageMATLAB:                "matlab",
+	DocxCodeLanguageMakefile:              "makefile",
+	DocxCodeLanguageMarkdown:              "markdown",
+	DocxCodeLanguageNginx:                 "nginx",
+	DocxCodeLanguageObjective:             "objectivec",
+	DocxCodeLanguageOpenEdgeABL:           "openedgeabl",
+	DocxCodeLanguagePHP:                   "php",
+	DocxCodeLanguagePerl:                  "perl",
+	DocxCodeLanguagePostScript:            "postscript",
+	DocxCodeLanguagePowerShell:            "powershell",
+	DocxCodeLanguageProlog:                "prolog",
+	DocxCodeLanguageProtoBuf:              "protobuf",
+	DocxCodeLanguagePython:                "python",
+	DocxCodeLanguageR:                     "r",
+	DocxCodeLanguageRPG:                   "rpgle",
+	DocxCodeLanguageRuby:                  "ruby",
+	DocxCodeLanguageRust:                  "rust",
+	DocxCodeLanguageSAS:                   "sas",
+	DocxCodeLanguageSCSS:                  "scss",
+	DocxCodeLanguageSQL:                   "sql",
+	DocxCodeLanguageScala:                 "scala",
+	DocxCodeLanguageScheme:                "scheme",
+	DocxCodeLanguageScratch:               "scratch",
+	DocxCodeLanguageShell:                 "shell",
+	DocxCodeLanguageSwift:                 "swift",
+	DocxCodeLanguageThrift:                "thrift",
+	DocxCodeLanguageTypeScript:            "typescript",
+	DocxCodeLanguageVBScript:              "vbscript",
+	DocxCodeLanguageVisual:                "visual",
+	DocxCodeLanguageXML:                   "xml",
+	DocxCodeLanguageYAML:                  "yaml",
+	DocxCodeLanguageCMAKE:                 "cmake",
+	DocxCodeLanguageDiff:                  "diff",
+	DocxCodeLanguageGherkin:               "gherkin",
+	DocxCodeLanguageGraphQL:               "graphql",
+	DocxCodeLanguageOpenGLShadingLanguage: "glsl",
+	DocxCodeLanguageProperties:            "properties",
+	DocxCodeLanguageSolidity:              "solidity",
+	DocxCodeLanguageTOML:                  "toml",
+}

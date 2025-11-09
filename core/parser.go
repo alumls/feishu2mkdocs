@@ -65,6 +65,7 @@ func (p *Parser) ParseDocxBlock(b *larkdocx.Block, indentLevel int) string {
 	case DocxBlockTypeTodo:
 		buf.WriteString(p.ParseDocxBlockTodo(b, indentLevel))
 	case DocxBlockTypeCode:
+		buf.WriteString(p.ParseDocxBlockCode(b))
 	case DocxBlockTypeQuote:
 	case DocxBlockTypeCallout:
 	case DocxBlockTypeDivider:
@@ -175,6 +176,16 @@ func (p *Parser) ParseDocxBlockTodo(b *larkdocx.Block, indentLevel int) string {
 		childBlock := p.blockMap[childId]
 		buf.WriteString(p.ParseDocxBlock(childBlock, indentLevel + 1))
 	}
+
+	return buf.String()
+}
+
+func (p *Parser) ParseDocxBlockCode(b *larkdocx.Block) string {
+	buf := new(strings.Builder)
+
+	buf.WriteString("```" + DocxCodeLang2MdStr[*b.Code.Style.Language] + "\n")
+	buf.WriteString(strings.TrimSpace(p.ParseDocxBlockText(b.Code)))
+	buf.WriteString("\n```\n")
 
 	return buf.String()
 }
