@@ -34,7 +34,7 @@ func (p *Parser) ParseDocxsContent(node *larkwiki.Node, blocks []*larkdocx.Block
 
 func (p *Parser) ParseDocxBlock(b *larkdocx.Block, indentLevel int) string {
 	buf := new(strings.Builder)
-	buf.WriteString(strings.Repeat("\t", indentLevel))
+	buf.WriteString(strings.Repeat("    ", indentLevel))
 	switch *b.BlockType {
 	case DocxBlockTypePage:
 		buf.WriteString(p.ParseDocxBlockPage(b))
@@ -66,7 +66,8 @@ func (p *Parser) ParseDocxBlock(b *larkdocx.Block, indentLevel int) string {
 		buf.WriteString(p.ParseDocxBlockTodo(b, indentLevel))
 	case DocxBlockTypeCode:
 		buf.WriteString(p.ParseDocxBlockCode(b))
-	case DocxBlockTypeQuote:
+	case DocxBlockTypeQuoteContainer:
+		buf.WriteString(p.ParseDocxBlockQuote(b))
 	case DocxBlockTypeCallout:
 	case DocxBlockTypeDivider:
 	case DocxBlockTypeImage:
@@ -188,6 +189,35 @@ func (p *Parser) ParseDocxBlockCode(b *larkdocx.Block) string {
 	buf.WriteString("\n```\n")
 
 	return buf.String()
+}
+
+func (p *Parser) ParseDocxBlockQuote(b *larkdocx.Block) string {
+	buf := new(strings.Builder)
+
+	buf.WriteString("> ")
+
+	startIndex := buf.Len()
+
+	for _, childId := range b.Children {
+		childBlock := p.blockMap[childId]
+		buf.WriteString(p.ParseDocxBlock(childBlock, 0))
+		buf.WriteString("\n")
+	}
+
+	s := buf.String()
+
+	newPart := s[startIndex: len(s)-2]
+
+	processed := new(strings.Builder)
+	for i := 0; i < len(newPart); i++ {
+		processed.WriteByte(newPart[i])
+		if newPart[i] == '\n' && i < len(newPart)-1 {
+			processed.WriteString("> ")
+		}
+	}
+	processed.WriteString("\n")
+
+	return s[:startIndex] + processed.String()
 }
 
 func (p *Parser) ParseDocxTextElement(e *larkdocx.TextElement, inline bool) string {
