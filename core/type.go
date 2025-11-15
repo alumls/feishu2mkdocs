@@ -210,3 +210,18 @@ var DocxCodeLang2MdStr = map[int]string{
 	DocxCodeLanguageSolidity:              "solidity",
 	DocxCodeLanguageTOML:                  "toml",
 }
+
+var DocxCalloutEmoji2MdStr = map[string]string{
+	"memo":    "note",
+	"jigsaw": "abstract",
+	"information_source":  "info",
+	"bulb": "tip",
+	"white_check_mark": "success",
+	"question": "question",
+	"warning":"warning",
+	"x":"failure",
+	"bangbang":"danger",
+	"ladybug":"bug",
+	"test_tube":"example",
+	"speech_balloon":"quote",
+}

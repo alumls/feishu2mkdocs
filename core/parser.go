@@ -69,6 +69,7 @@ func (p *Parser) ParseDocxBlock(b *larkdocx.Block, indentLevel int) string {
 	case DocxBlockTypeQuoteContainer:
 		buf.WriteString(p.ParseDocxBlockQuote(b))
 	case DocxBlockTypeCallout:
+		buf.WriteString(p.ParseDocxBlockCallout(b))
 	case DocxBlockTypeDivider:
 	case DocxBlockTypeImage:
 	case DocxBlockTypeFile:
@@ -213,6 +214,41 @@ func (p *Parser) ParseDocxBlockQuote(b *larkdocx.Block) string {
 		processed.WriteByte(newPart[i])
 		if newPart[i] == '\n' && i < len(newPart)-1 {
 			processed.WriteString("> ")
+		}
+	}
+	processed.WriteString("\n")
+
+	return s[:startIndex] + processed.String()
+}
+
+func (p *Parser) ParseDocxBlockCallout(b *larkdocx.Block) string {
+	buf := new(strings.Builder)
+
+	calloutType := "note"
+
+	if newCalloutType, ok := DocxCalloutEmoji2MdStr[*b.Callout.EmojiId]; ok {
+		calloutType = newCalloutType
+	}
+
+	buf.WriteString("!!! "+ calloutType + "\n\n    ")
+
+	startIndex := buf.Len()
+
+	for _, childId := range b.Children {
+		childBlock := p.blockMap[childId]
+		buf.WriteString(p.ParseDocxBlock(childBlock, 0))
+		buf.WriteString("\n")
+	}
+
+	s := buf.String()
+
+	newPart := s[startIndex: len(s)-2]
+
+	processed := new(strings.Builder)
+	for i := 0; i < len(newPart); i++ {
+		processed.WriteByte(newPart[i])
+		if newPart[i] == '\n' && i < len(newPart)-1 {
+			processed.WriteString("    ")
 		}
 	}
 	processed.WriteString("\n")
