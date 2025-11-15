@@ -1,20 +1,25 @@
 package core
 
-// Option:
+import (
+	"os"
+	"gopkg.in/yaml.v3"
+)
+
+// Future Option:
 // 	- StartHeading
 // 	- MaxHeading
 // 	- TagsDetectEnable
 // 	- LogOutput
 
 type Config struct{
-	Feishu FeishuConfig `json:"feishu"`
-	Output OutputConfig `json:"output"`
+	Feishu FeishuConfig `yaml:"feishu"`
+	Output OutputConfig `yaml:"output"`
 }
 
 type FeishuConfig struct {
-	AppId     string `json:"app_id"`
-	AppSecret string `json:"app_secret"`
-	SpaceId   string `json:"space_id"`
+	AppId     string `yaml:"app_id"`
+	AppSecret string `yaml:"app_secret"`
+	SpaceId   string `yaml:"space_id"`
 }
 
 type OutputConfig struct {
@@ -33,4 +38,19 @@ func NewConfig(appId, appSecret, spaceId string) *Config {
 			SpaceId: spaceId,
 		},
 	}
+}
+
+func ReadFromConfigFile(path string) (*Config, error) {
+	data, err := os.ReadFile(path)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var cfg Config
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		return nil,err
+	}
+
+	return  &cfg, nil
 }
