@@ -71,6 +71,7 @@ func (p *Parser) ParseDocxBlock(b *larkdocx.Block, indentLevel int) string {
 	case DocxBlockTypeCallout:
 		buf.WriteString(p.ParseDocxBlockCallout(b))
 	case DocxBlockTypeDivider:
+		buf.WriteString("---\n")
 	case DocxBlockTypeImage:
 	case DocxBlockTypeFile:
 	default:
