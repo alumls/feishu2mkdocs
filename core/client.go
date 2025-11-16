@@ -66,6 +66,24 @@ func (c *Client) GetWikiNodeList(ctx context.Context, spaceId string, parentNode
 	return nodes, nil
 }
 
+func(c *Client) GetWikiNodeListAll(ctx context.Context, spaceId string, parentNodeToken *string) ([]*larkwiki.Node, error) {
+	currentNodes, err := c.GetWikiNodeList(ctx, spaceId, parentNodeToken)
+	resultNodes := currentNodes
+	for _, node := range currentNodes {
+		if *node.HasChild {
+			nodes, err := c.GetWikiNodeListAll(ctx, spaceId, node.NodeToken)
+			if err != nil {
+				return nil, err
+			}
+			resultNodes = append(resultNodes, nodes...)
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	return resultNodes, nil
+}
+
 func (c *Client) GetDocumentBlockAll(ctx context.Context, documentId string) ([]*larkdocx.Block, error) {
 
 	req := larkdocx.NewListDocumentBlockReqBuilder().
