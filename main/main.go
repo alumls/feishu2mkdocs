@@ -3,7 +3,8 @@ package main
 import (
 	//"context"
 	"feishu2mkdocs/core"
-	"feishu2mkdocs/utils"
+	//"feishu2mkdocs/utils"
+	"feishu2mkdocs/service"
 	//"os"
 	"fmt"
 )
@@ -14,5 +15,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(utils.PrettyPrint(config))
+	//fmt.Println(utils.PrettyPrint(config))
+	client := core.NewClient(config.Feishu.AppId, config.Feishu.AppSecret)
+	service.GenerateWikiContent(client, config)
 }

@@ -2,6 +2,7 @@ package core
 
 import (
 	"os"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -11,7 +12,7 @@ import (
 // 	- TagsDetectEnable
 // 	- LogOutput
 
-type Config struct{
+type Config struct {
 	Feishu FeishuConfig `yaml:"feishu"`
 	Output OutputConfig `yaml:"output"`
 }
@@ -23,19 +24,22 @@ type FeishuConfig struct {
 }
 
 type OutputConfig struct {
-	
+	DocsDir string `yaml:"docs_dir"`
 }
 
-//Create Config
-//appId: 应用的 App ID
-//appSecret: 应用的 App Secret
-//spaceId: 知识库的 Space ID
-func NewConfig(appId, appSecret, spaceId string) *Config {
+// Create Config
+// appId: 应用的 App ID
+// appSecret: 应用的 App Secret
+// spaceId: 知识库的 Space ID
+func NewConfig(appId, appSecret, spaceId, docsDir string) *Config {
 	return &Config{
 		Feishu: FeishuConfig{
 			AppId:     appId,
 			AppSecret: appSecret,
-			SpaceId: spaceId,
+			SpaceId:   spaceId,
+		},
+		Output: OutputConfig{
+			DocsDir: "docs",
 		},
 	}
 }
@@ -49,8 +53,8 @@ func ReadFromConfigFile(path string) (*Config, error) {
 
 	var cfg Config
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return nil,err
+		return nil, err
 	}
 
-	return  &cfg, nil
+	return &cfg, nil
 }
