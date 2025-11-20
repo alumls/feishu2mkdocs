@@ -11,11 +11,17 @@ import (
 	larkwiki "github.com/larksuite/oapi-sdk-go/v3/service/wiki/v2"
 )
 
+// TODO: 由于feishu和mkdocs的解析器差异，有些语法并不能在mkdocs中得到支持，但是目前Parser没有做这一层的处理，如果出些不支持的语法，应该给出相应的警告。
+
 type Parser struct {
 	ImgTokens []string
 	blockMap  map[string]*larkdocx.Block
 }
 
+// NewParser: 创建一个Parser实例。
+//
+// 参数：
+//   - config: 输出配置
 func NewParser(config OutputConfig) *Parser {
 	return &Parser{
 		ImgTokens: make([]string, 0),
@@ -23,13 +29,45 @@ func NewParser(config OutputConfig) *Parser {
 	}
 }
 
-func (p *Parser) ParseDocxsContent(node *larkwiki.Node, blocks []*larkdocx.Block) string {
+// ParseDocxsContent: 解析文档内容。该函数往往作为外部调用，用于解析知识库节点下的文档内容。
+//
+// 参数：
+//   - node: 知识库节点
+//   - blocks: 文档块
+func (p *Parser) ParseDocxsContent(node *larkwiki.Node, blocks []*larkdocx.Block) (string, error) {
+	if utils.IsNilPointer(node) {
+		return "", fmt.Errorf(
+			"ParseDocxsContent error: node pointer is nil (node=%+v)",
+			node,
+		)
+	}
+
 	for _, block := range blocks {
+		if utils.IsNilPointer(block) {
+			return "", fmt.Errorf(
+				"ParseDocxsContent error: block pointer is nil (block=%+v)",
+				block,
+			)
+		}
+		if utils.IsNilPointer(block.BlockId) {
+			return "", fmt.Errorf(
+				"ParseDocxsContent error: block.BlockId pointer is nil (blockId=%+v)",
+				block.BlockId,
+			)
+		}
 		p.blockMap[*block.BlockId] = block
 	}
 
+	// TODO: 目前存在生成的md文件有多余空行的问题，可以在这里对解析后的字符串进行处理，移除多余空行。
+
+	if utils.IsNilPointer(node.ObjToken) {
+		return "", fmt.Errorf(
+			"ParseDocxsContent error: node.ObjToken pointer is nil (nodeObjToken=%+v)",
+			node.ObjToken,
+		)
+	}
 	entryBlock := p.blockMap[*node.ObjToken]
-	return p.ParseDocxBlock(entryBlock, 0)
+	return p.ParseDocxBlock(entryBlock, 0), nil
 }
 
 func (p *Parser) ParseDocxBlock(b *larkdocx.Block, indentLevel int) string {
@@ -73,7 +111,9 @@ func (p *Parser) ParseDocxBlock(b *larkdocx.Block, indentLevel int) string {
 	case DocxBlockTypeDivider:
 		buf.WriteString("---\n")
 	case DocxBlockTypeImage:
+		// TODO: 这里需要做解析图片函数的入口。
 	case DocxBlockTypeFile:
+		// TODO: 这里需要做解析文件的入口。
 	default:
 	}
 	return buf.String()

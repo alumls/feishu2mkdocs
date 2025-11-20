@@ -17,3 +17,7 @@ func SanitizeFileName(name string) string {
 	}
 	return name
 }
+
+func IsNilPointer[T any](p *T) bool {
+    return p == nil
+}

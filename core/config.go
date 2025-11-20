@@ -6,7 +6,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Future Option:
+// Future output options may include:
 // 	- StartHeading
 // 	- MaxHeading
 // 	- TagsDetectEnable
@@ -27,11 +27,13 @@ type OutputConfig struct {
 	DocsDir string `yaml:"docs_dir"`
 }
 
-// Create Config
-// appId: 应用的 App ID
-// appSecret: 应用的 App Secret
-// spaceId: 知识库的 Space ID
-func NewConfig(appId, appSecret, spaceId, docsDir string) *Config {
+// NewConfig: 创建一个Config实例。该函数只保留了Config的必要接口，其它接口将以默认值填充。
+//
+// 参数：
+//   - appId: 应用的 App ID
+//   - appSecret: 应用的 App Secret
+//   - spaceId: 知识库的 Space ID
+func NewConfig(appId, appSecret, spaceId string) *Config {
 	return &Config{
 		Feishu: FeishuConfig{
 			AppId:     appId,
@@ -43,7 +45,10 @@ func NewConfig(appId, appSecret, spaceId, docsDir string) *Config {
 		},
 	}
 }
-
+// ReadFromConfigFile: 从配置文件中读取配置。
+//
+// 参数：
+//   - path: 配置文件的路径
 func ReadFromConfigFile(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 

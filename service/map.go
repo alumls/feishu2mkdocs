@@ -7,11 +7,11 @@ import (
 	larkwiki "github.com/larksuite/oapi-sdk-go/v3/service/wiki/v2"
 )
 
-type WikiMap struct {
-	WikiMapNode map[string]*WikiMeta
+type NodeMap struct {
+	NodeMeta map[string]*NodeMeta
 }
 
-type WikiMeta struct {
+type NodeMeta struct {
 	Dir string
 	Path string
 	ChildNodeTokens []string
@@ -19,93 +19,103 @@ type WikiMeta struct {
 	Node *larkwiki.Node
 }
 
-func NewWikiMap() *WikiMap {
-	return &WikiMap{
-		WikiMapNode: make(map[string]*WikiMeta),
+func NewNodeMap() *NodeMap {
+	return &NodeMap{
+		NodeMeta: make(map[string]*NodeMeta),
 	}
 }
 
-func (m *WikiMap) WikiMapAddNode (node *larkwiki.Node, path string, isShortCut bool) {
-	m.WikiMapNode[*node.NodeToken] = &WikiMeta{
+func (m *NodeMap) NodeMapAddNode (node *larkwiki.Node, path string, isShortCut bool) error {
+	if utils.IsNilPointer(node) {
+		return fmt.Errorf(
+			"NodeMapAddNode error: node pointer is nil (node=%+v)",
+			node,
+		)
+	}
+	m.NodeMeta[*node.NodeToken] = &NodeMeta{
 		ChildNodeTokens: make([]string, 0),
 		IsShortCut: isShortCut,
 		Node: node,
 	}
+	return nil
 }
 
-func (m *WikiMap) WikiMapBuildFromFlatNodes(nodes []*larkwiki.Node, docsRoot string) error {
+func (m *NodeMap) NodeMapBuildFromFlatNodes(nodes []*larkwiki.Node, docsRoot string) error {
 	for _, node := range nodes {
-		if node.NodeToken == nil {
-			continue
-		}
 		isShortCut := false
 		if *node.ObjType == "shortcut" {
 			isShortCut = true
 		}
-		m.WikiMapAddNode(node, "", isShortCut)
+		err := m.NodeMapAddNode(node, "", isShortCut)
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, node := range nodes {
 		if *node.ParentNodeToken != "" {
-			m.WikiMapNodeAddChild(*node.ParentNodeToken, *node.NodeToken)
+			err := m.NodeMapNodeAddChild(*node.ParentNodeToken, *node.NodeToken)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	for _, node := range nodes {
-		rootPath, err := m.WikiMapNodeResolveRootPath(*node.NodeToken, docsRoot)
+		rootPath, err := m.NodeMapNodeResolveRootPath(*node.NodeToken, docsRoot)
 		if err != nil {
 			return err
 		}
-		fileName, err := m.WikiMapNodeResolveFileName(*node.NodeToken)
+		fileName, err := m.NodeMapNodeResolveFileName(*node.NodeToken)
 		if err != nil {
 			return err
 		}
 
 		if *node.HasChild {
-			m.WikiMapNode[*node.NodeToken].Path = rootPath + "/" + fileName + "/" + fileName + ".md"
-			m.WikiMapNode[*node.NodeToken].Dir = rootPath + "/" + fileName
+			m.NodeMeta[*node.NodeToken].Path = rootPath + "/" + fileName + "/" + fileName + ".md"
+			m.NodeMeta[*node.NodeToken].Dir = rootPath + "/" + fileName
 		} else {
-			m.WikiMapNode[*node.NodeToken].Path = rootPath + "/" + fileName + ".md"
-			m.WikiMapNode[*node.NodeToken].Dir = rootPath
+			m.NodeMeta[*node.NodeToken].Path = rootPath + "/" + fileName + ".md"
+			m.NodeMeta[*node.NodeToken].Dir = rootPath
 		}
 	}
 	return nil
 }
 
-func (m *WikiMap) WikiMapNodeResolveRootPath(nodeToken string, docsRoot string) (string, error){
-	if _, ok := m.WikiMapNode[nodeToken]; !ok {
+func (m *NodeMap) NodeMapNodeResolveRootPath(nodeToken string, docsRoot string) (string, error){
+	if _, ok := m.NodeMeta[nodeToken]; !ok {
 		return "", fmt.Errorf("missing Node: %s", nodeToken)
 	}
-	if *m.WikiMapNode[nodeToken].Node.ParentNodeToken == "" {
+	if *m.NodeMeta[nodeToken].Node.ParentNodeToken == "" {
 		return docsRoot, nil
 	}
 
-	parentNodeToken := *m.WikiMapNode[nodeToken].Node.ParentNodeToken
-	parentNodeTitle := *m.WikiMapNode[parentNodeToken].Node.Title
+	parentNodeToken := *m.NodeMeta[nodeToken].Node.ParentNodeToken
+	parentNodeTitle := *m.NodeMeta[parentNodeToken].Node.Title
 	if parentNodeTitle == "" {
 		parentNodeTitle = "untitled-" + parentNodeToken
 	}
 
-	rootPath, _ := m.WikiMapNodeResolveRootPath(parentNodeToken, docsRoot)
+	rootPath, _ := m.NodeMapNodeResolveRootPath(parentNodeToken, docsRoot)
 
 	return  rootPath + "/" + utils.SanitizeFileName(parentNodeTitle), nil
 }
 
-func (m *WikiMap) WikiMapNodeResolveFileName(nodeToken string) (string, error){
-	if _, ok := m.WikiMapNode[nodeToken]; !ok {
+func (m *NodeMap) NodeMapNodeResolveFileName(nodeToken string) (string, error){
+	if _, ok := m.NodeMeta[nodeToken]; !ok {
 		return "", fmt.Errorf("missing Node: %s", nodeToken)
 	}
-	title := *m.WikiMapNode[nodeToken].Node.Title
+	title := *m.NodeMeta[nodeToken].Node.Title
 	if title == "" {
 		title = "untitled-" + nodeToken
 	}
 	return utils.SanitizeFileName(title), nil
 }
 
-func (m *WikiMap) WikiMapNodeAddChild(nodeToken string, childNodeToken string) error{
-	if _, ok := m.WikiMapNode[nodeToken]; !ok {
+func (m *NodeMap) NodeMapNodeAddChild(nodeToken string, childNodeToken string) error{
+	if _, ok := m.NodeMeta[nodeToken]; !ok {
 		return fmt.Errorf("missing Node: %s", nodeToken)
 	}
-	m.WikiMapNode[nodeToken].ChildNodeTokens = append(m.WikiMapNode[nodeToken].ChildNodeTokens, childNodeToken)
+	m.NodeMeta[nodeToken].ChildNodeTokens = append(m.NodeMeta[nodeToken].ChildNodeTokens, childNodeToken)
 	return nil
 }

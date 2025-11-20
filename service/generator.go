@@ -13,23 +13,24 @@ import (
 func GenerateWikiContent(c *core.Client, cfg *core.Config) error {
 	parentNodeToken := ""
 
-	wikiMap := NewWikiMap()
+	nodeMap := NewNodeMap()
 	
 	nodes, _ := c.GetWikiNodeListAll(context.Background(), cfg.Feishu.SpaceId, &parentNodeToken)
 
-	//fmt.Println(utils.PrettyPrint(nodes))
-
-	wikiMap.WikiMapBuildFromFlatNodes(nodes, cfg.Output.DocsDir)
+	nodeMap.NodeMapBuildFromFlatNodes(nodes, cfg.Output.DocsDir)
 	
 	parser := core.NewParser(cfg.Output)
 
 	for _, node := range nodes {
-		blocks, _ := c.GetDocumentBlockAll(context.Background(), *node.ObjToken)
-		// fmt.Println(node)
-		// fmt.Println(blocks)
-		md := parser.ParseDocxsContent(node, blocks)
-		path := wikiMap.WikiMapNode[*node.NodeToken].Path
-		dir := wikiMap.WikiMapNode[*node.NodeToken].Dir
+		blocks, _ := c.GetDocumentBlockAll(context.Background(), node.ObjToken)
+		md, err := parser.ParseDocxsContent(node, blocks)
+
+		if err != nil {
+			return err
+		}
+
+		path := nodeMap.NodeMeta[*node.NodeToken].Path
+		dir := nodeMap.NodeMeta[*node.NodeToken].Dir
 
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			fmt.Println("创建目录失败:", err)
@@ -41,7 +42,7 @@ func GenerateWikiContent(c *core.Client, cfg *core.Config) error {
 			return err
 		}
 
-		fmt.Println("输出已保存到" + path)
+		fmt.Println( *node.NodeToken + ": 输出已保存到 " + path)
 	}
 
 	return nil
