@@ -10,25 +10,40 @@ import (
 	//larkwiki "github.com/larksuite/oapi-sdk-go/v3/service/wiki/v2"
 )
 
-func (m *NodeMap) GenerateWikiContent(c *core.Client, cfg *core.Config) error {
+type Generator struct {
+	Client *core.Client
+	Config *core.Config
+	Parser *core.Parser
+	NodeMap *core.NodeMap
+}
+
+func NewGenerator(c *core.Client, cfg *core.Config) *Generator {
+	nodeMap := core.NewNodeMap()
+	return &Generator{
+		Client: c,
+		Config: cfg,
+		Parser: core.NewParser(cfg.Output, nodeMap),
+		NodeMap: nodeMap,
+	}
+}
+
+func (g *Generator) GenerateWikiContent() error {
 	parentNodeToken := ""
 
-	nodes, _ := c.GetWikiNodeListAll(context.Background(), cfg.Feishu.SpaceId, &parentNodeToken)
+	nodes, _ := g.Client.GetWikiNodeListAll(context.Background(), g.Config.Feishu.SpaceId, &parentNodeToken)
 
-	m.NodeMapBuildFromFlatNodes(nodes, cfg.Output.DocsDir)
-
-	parser := core.NewParser(cfg.Output)
+	g.NodeMap.BuildFromFlatNodes(nodes, g.Config.Output.DocsDir)
 
 	for _, node := range nodes {
-		blocks, _ := c.GetDocumentBlockAll(context.Background(), node.ObjToken)
-		md, err := parser.ParseDocxsContent(node, blocks)
+		blocks, _ := g.Client.GetDocumentBlockAll(context.Background(), node.ObjToken)
+		md, err := g.Parser.ParseDocxsContent(node, blocks)
 
 		if err != nil {
 			return err
 		}
 
-		path := m.NodeMeta[*node.NodeToken].Path
-		dir := m.NodeMeta[*node.NodeToken].Dir
+		path := g.NodeMap.NodeMeta[*node.NodeToken].Path
+		dir := g.NodeMap.NodeMeta[*node.NodeToken].Dir
 
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			fmt.Println("创建目录失败:", err)
@@ -46,3 +61,6 @@ func (m *NodeMap) GenerateWikiContent(c *core.Client, cfg *core.Config) error {
 	return nil
 }
 
+func (g *Generator) GenerateWikiNav(cfg *core.Config, yamlDir string) error {
+	return nil
+}

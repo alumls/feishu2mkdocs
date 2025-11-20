@@ -1,4 +1,4 @@
-package service
+package core
 
 import (
 	"feishu2mkdocs/utils"
@@ -25,7 +25,7 @@ func NewNodeMap() *NodeMap {
 	}
 }
 
-func (m *NodeMap) NodeMapAddNode (node *larkwiki.Node, path string, isShortCut bool) error {
+func (m *NodeMap) AddNode (node *larkwiki.Node, path string, isShortCut bool) error {
 	if utils.IsNilPointer(node) {
 		return fmt.Errorf(
 			"NodeMapAddNode error: node pointer is nil (node=%+v)",
@@ -40,13 +40,13 @@ func (m *NodeMap) NodeMapAddNode (node *larkwiki.Node, path string, isShortCut b
 	return nil
 }
 
-func (m *NodeMap) NodeMapBuildFromFlatNodes(nodes []*larkwiki.Node, docsRoot string) error {
+func (m *NodeMap) BuildFromFlatNodes(nodes []*larkwiki.Node, docsRoot string) error {
 	for _, node := range nodes {
 		isShortCut := false
 		if *node.ObjType == "shortcut" {
 			isShortCut = true
 		}
-		err := m.NodeMapAddNode(node, "", isShortCut)
+		err := m.AddNode(node, "", isShortCut)
 		if err != nil {
 			return err
 		}
@@ -54,7 +54,7 @@ func (m *NodeMap) NodeMapBuildFromFlatNodes(nodes []*larkwiki.Node, docsRoot str
 
 	for _, node := range nodes {
 		if *node.ParentNodeToken != "" {
-			err := m.NodeMapNodeAddChild(*node.ParentNodeToken, *node.NodeToken)
+			err := m.NodeAddChild(*node.ParentNodeToken, *node.NodeToken)
 			if err != nil {
 				return err
 			}
@@ -62,11 +62,11 @@ func (m *NodeMap) NodeMapBuildFromFlatNodes(nodes []*larkwiki.Node, docsRoot str
 	}
 
 	for _, node := range nodes {
-		rootPath, err := m.NodeMapNodeResolveRootPath(*node.NodeToken, docsRoot)
+		rootPath, err := m.NodeResolveRootPath(*node.NodeToken, docsRoot)
 		if err != nil {
 			return err
 		}
-		fileName, err := m.NodeMapNodeResolveFileName(*node.NodeToken)
+		fileName, err := m.NodeResolveFileName(*node.NodeToken)
 		if err != nil {
 			return err
 		}
@@ -82,7 +82,7 @@ func (m *NodeMap) NodeMapBuildFromFlatNodes(nodes []*larkwiki.Node, docsRoot str
 	return nil
 }
 
-func (m *NodeMap) NodeMapNodeResolveRootPath(nodeToken string, docsRoot string) (string, error){
+func (m *NodeMap) NodeResolveRootPath(nodeToken string, docsRoot string) (string, error){
 	if _, ok := m.NodeMeta[nodeToken]; !ok {
 		return "", fmt.Errorf("missing Node: %s", nodeToken)
 	}
@@ -96,12 +96,12 @@ func (m *NodeMap) NodeMapNodeResolveRootPath(nodeToken string, docsRoot string) 
 		parentNodeTitle = "untitled-" + parentNodeToken
 	}
 
-	rootPath, _ := m.NodeMapNodeResolveRootPath(parentNodeToken, docsRoot)
+	rootPath, _ := m.NodeResolveRootPath(parentNodeToken, docsRoot)
 
 	return  rootPath + "/" + utils.SanitizeFileName(parentNodeTitle), nil
 }
 
-func (m *NodeMap) NodeMapNodeResolveFileName(nodeToken string) (string, error){
+func (m *NodeMap) NodeResolveFileName(nodeToken string) (string, error){
 	if _, ok := m.NodeMeta[nodeToken]; !ok {
 		return "", fmt.Errorf("missing Node: %s", nodeToken)
 	}
@@ -112,7 +112,7 @@ func (m *NodeMap) NodeMapNodeResolveFileName(nodeToken string) (string, error){
 	return utils.SanitizeFileName(title), nil
 }
 
-func (m *NodeMap) NodeMapNodeAddChild(nodeToken string, childNodeToken string) error{
+func (m *NodeMap) NodeAddChild(nodeToken string, childNodeToken string) error{
 	if _, ok := m.NodeMeta[nodeToken]; !ok {
 		return fmt.Errorf("missing Node: %s", nodeToken)
 	}

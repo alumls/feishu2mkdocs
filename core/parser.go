@@ -16,16 +16,20 @@ import (
 type Parser struct {
 	ImgTokens []string
 	blockMap  map[string]*larkdocx.Block
+	nodeMap *NodeMap
+	config OutputConfig
 }
 
 // NewParser: 创建一个Parser实例。
 //
 // 参数：
 //   - config: 输出配置
-func NewParser(config OutputConfig) *Parser {
+func NewParser(config OutputConfig, nodeMap *NodeMap) *Parser {
 	return &Parser{
 		ImgTokens: make([]string, 0),
 		blockMap:  make(map[string]*larkdocx.Block),
+		nodeMap: nodeMap,
+		config: config,
 	}
 }
 
@@ -309,6 +313,9 @@ func (p *Parser) ParseDocxTextElement(e *larkdocx.TextElement, inline bool) stri
 		}
 		buf.WriteString(symbol + strings.TrimSuffix(*e.Equation.Content, "\n") + symbol)
 	}
+	if e.MentionDoc != nil {
+		buf.WriteString(p.ParseDocxTextElementMentionDoc(e.MentionDoc))
+	}
 	return buf.String()
 }
 
@@ -350,3 +357,43 @@ func (p *Parser) ParseDocxTextElementTextRun(tr *larkdocx.TextRun) string {
 	return buf.String()
 }
 
+func (p *Parser) ParseDocxTextElementMentionDoc(md *larkdocx.MentionDoc) string {
+	buf := new(strings.Builder)
+	postWrite := ""
+
+	if style := md.TextElementStyle; style != nil {
+		if *style.Bold {
+			buf.WriteString("**")
+			postWrite = "**" + postWrite
+		}
+		if *style.Italic {
+			buf.WriteString("*")
+			postWrite = "*" + postWrite
+		}
+		if *style.Strikethrough {
+			buf.WriteString("~~")
+			postWrite = "~~" + postWrite
+		}
+		if *style.Underline {
+			buf.WriteString("^^")
+			postWrite = "^^" + postWrite
+		}
+		if *style.InlineCode {
+			buf.WriteString("`")
+			postWrite = "`" + postWrite
+		}
+	}
+	if p.nodeMap == nil {
+		buf.WriteString(fmt.Sprintf("[%s](%s)", *md.Title, utils.UnescapeURL(*md.Url)))
+	} else if nodeMeta, ok := p.nodeMap.NodeMeta[*md.Token]; ok {
+		path := strings.TrimPrefix(nodeMeta.Path, p.config.DocsDir + "/")
+		fmt.Println(path)
+		fmt.Println(nodeMeta.Path)
+		fmt.Println(p.config.DocsDir + "/")
+		buf.WriteString(fmt.Sprintf("[%s](%s)", *md.Title, path))
+	} else {
+		buf.WriteString(fmt.Sprintf("[%s](%s)", *md.Title, utils.UnescapeURL(*md.Url)))
+	}
+	buf.WriteString(postWrite)
+	return buf.String()
+}
