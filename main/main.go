@@ -17,5 +17,6 @@ func main() {
 	}
 	//fmt.Println(utils.PrettyPrint(config))
 	client := core.NewClient(config.Feishu.AppId, config.Feishu.AppSecret)
-	service.GenerateWikiContent(client, config)
+	nodeMap := service.NewNodeMap()
+	nodeMap.GenerateWikiContent(client, config)
 }
