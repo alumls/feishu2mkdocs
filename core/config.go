@@ -25,6 +25,7 @@ type FeishuConfig struct {
 
 type OutputConfig struct {
 	DocsDir string `yaml:"docs_dir"`
+	YamlPath string `yaml:"yaml_path"`
 }
 
 // NewConfig: 创建一个Config实例。该函数只保留了Config的必要接口，其它接口将以默认值填充。

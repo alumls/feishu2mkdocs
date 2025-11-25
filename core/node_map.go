@@ -9,10 +9,13 @@ import (
 
 type NodeMap struct {
 	NodeMeta map[string]*NodeMeta
+	FileNameCount map[string]int
+	Entries []string
 }
 
 type NodeMeta struct {
 	Dir string
+	FileName string
 	Path string
 	ChildNodeTokens []string
 	IsShortCut bool
@@ -22,6 +25,8 @@ type NodeMeta struct {
 func NewNodeMap() *NodeMap {
 	return &NodeMap{
 		NodeMeta: make(map[string]*NodeMeta),
+		FileNameCount: make(map[string]int),
+		Entries: make([]string, 0),
 	}
 }
 
@@ -37,6 +42,7 @@ func (m *NodeMap) AddNode (node *larkwiki.Node, path string, isShortCut bool) er
 		IsShortCut: isShortCut,
 		Node: node,
 	}
+	m.Entries = append(m.Entries, *node.NodeToken)
 	return nil
 }
 
@@ -69,8 +75,9 @@ func (m *NodeMap) BuildFromFlatNodes(nodes []*larkwiki.Node, docsRoot string) er
 		fileName, err := m.NodeResolveFileName(*node.NodeToken)
 		if err != nil {
 			return err
-		}
+		}	
 
+		m.NodeMeta[*node.NodeToken].FileName = fileName
 		if *node.HasChild {
 			m.NodeMeta[*node.NodeToken].Path = rootPath + "/" + fileName + "/" + fileName + ".md"
 			m.NodeMeta[*node.NodeToken].Dir = rootPath + "/" + fileName
