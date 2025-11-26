@@ -8,7 +8,7 @@ import (
 )
 
 type NodeMap struct {
-	NodeMeta map[string]*NodeMeta
+	Meta map[string]*NodeMeta
 	FileNameCount map[string]int
 	Entries []string
 }
@@ -24,7 +24,7 @@ type NodeMeta struct {
 
 func NewNodeMap() *NodeMap {
 	return &NodeMap{
-		NodeMeta: make(map[string]*NodeMeta),
+		Meta: make(map[string]*NodeMeta),
 		FileNameCount: make(map[string]int),
 		Entries: make([]string, 0),
 	}
@@ -37,7 +37,7 @@ func (m *NodeMap) AddNode (node *larkwiki.Node, path string, isShortCut bool) er
 			node,
 		)
 	}
-	m.NodeMeta[*node.NodeToken] = &NodeMeta{
+	m.Meta[*node.NodeToken] = &NodeMeta{
 		ChildNodeTokens: make([]string, 0),
 		IsShortCut: isShortCut,
 		Node: node,
@@ -77,28 +77,28 @@ func (m *NodeMap) BuildFromFlatNodes(nodes []*larkwiki.Node, docsRoot string) er
 			return err
 		}	
 
-		m.NodeMeta[*node.NodeToken].FileName = fileName
+		m.Meta[*node.NodeToken].FileName = fileName
 		if *node.HasChild {
-			m.NodeMeta[*node.NodeToken].Path = rootPath + "/" + fileName + "/" + fileName + ".md"
-			m.NodeMeta[*node.NodeToken].Dir = rootPath + "/" + fileName
+			m.Meta[*node.NodeToken].Path = rootPath + "/" + fileName + "/" + fileName + ".md"
+			m.Meta[*node.NodeToken].Dir = rootPath + "/" + fileName
 		} else {
-			m.NodeMeta[*node.NodeToken].Path = rootPath + "/" + fileName + ".md"
-			m.NodeMeta[*node.NodeToken].Dir = rootPath
+			m.Meta[*node.NodeToken].Path = rootPath + "/" + fileName + ".md"
+			m.Meta[*node.NodeToken].Dir = rootPath
 		}
 	}
 	return nil
 }
 
 func (m *NodeMap) NodeResolveRootPath(nodeToken string, docsRoot string) (string, error){
-	if _, ok := m.NodeMeta[nodeToken]; !ok {
+	if _, ok := m.Meta[nodeToken]; !ok {
 		return "", fmt.Errorf("missing Node: %s", nodeToken)
 	}
-	if *m.NodeMeta[nodeToken].Node.ParentNodeToken == "" {
+	if *m.Meta[nodeToken].Node.ParentNodeToken == "" {
 		return docsRoot, nil
 	}
 
-	parentNodeToken := *m.NodeMeta[nodeToken].Node.ParentNodeToken
-	parentNodeTitle := *m.NodeMeta[parentNodeToken].Node.Title
+	parentNodeToken := *m.Meta[nodeToken].Node.ParentNodeToken
+	parentNodeTitle := *m.Meta[parentNodeToken].Node.Title
 	if parentNodeTitle == "" {
 		parentNodeTitle = "untitled-" + parentNodeToken
 	}
@@ -109,10 +109,10 @@ func (m *NodeMap) NodeResolveRootPath(nodeToken string, docsRoot string) (string
 }
 
 func (m *NodeMap) NodeResolveFileName(nodeToken string) (string, error){
-	if _, ok := m.NodeMeta[nodeToken]; !ok {
+	if _, ok := m.Meta[nodeToken]; !ok {
 		return "", fmt.Errorf("missing Node: %s", nodeToken)
 	}
-	title := *m.NodeMeta[nodeToken].Node.Title
+	title := *m.Meta[nodeToken].Node.Title
 	if title == "" {
 		title = "untitled-" + nodeToken
 	}
@@ -120,9 +120,9 @@ func (m *NodeMap) NodeResolveFileName(nodeToken string) (string, error){
 }
 
 func (m *NodeMap) NodeAddChild(nodeToken string, childNodeToken string) error{
-	if _, ok := m.NodeMeta[nodeToken]; !ok {
+	if _, ok := m.Meta[nodeToken]; !ok {
 		return fmt.Errorf("missing Node: %s", nodeToken)
 	}
-	m.NodeMeta[nodeToken].ChildNodeTokens = append(m.NodeMeta[nodeToken].ChildNodeTokens, childNodeToken)
+	m.Meta[nodeToken].ChildNodeTokens = append(m.Meta[nodeToken].ChildNodeTokens, childNodeToken)
 	return nil
 }

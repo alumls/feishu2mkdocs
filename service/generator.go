@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"feishu2mkdocs/core"
-	"feishu2mkdocs/utils"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -46,8 +45,8 @@ func (g *Generator) GenerateWikiContent() error {
 			return err
 		}
 
-		path := g.NodeMap.NodeMeta[*node.NodeToken].Path
-		dir := g.NodeMap.NodeMeta[*node.NodeToken].Dir
+		path := g.NodeMap.Meta[*node.NodeToken].Path
+		dir := g.NodeMap.Meta[*node.NodeToken].Dir
 
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			fmt.Println("创建目录失败:", err)
@@ -78,8 +77,8 @@ func (g *Generator) GenerateWikiNav() error {
 	nodes := make(map[string]*navNode)
 	// 保持顺序：NodeOrder 给出的顺序
 	for _, nodeToken := range g.NodeMap.Entries {
-		meta := g.NodeMap.NodeMeta[nodeToken]
-		rel, _ := utils.Rel(meta.Path, g.Config.Output.DocsDir)
+		meta := g.NodeMap.Meta[nodeToken]
+		rel, _ := filepath.Rel(g.Config.Output.DocsDir, meta.Path)
 
 		// 一些 NodeMeta 字段可能不同名，请确保 NodeMap 中存在 Title 和 ParentNodeToken 字段
 		title := meta.Node.Title
@@ -126,7 +125,7 @@ func (g *Generator) GenerateWikiNav() error {
 
 	navList := make([]interface{}, 0)
 	for _, tok := range g.NodeMap.Entries {
-		meta := g.NodeMap.NodeMeta[tok]
+		meta := g.NodeMap.Meta[tok]
 		if *meta.Node.ParentNodeToken == "" {
 			entry := buildEntry(tok)
 			if entry != nil {
