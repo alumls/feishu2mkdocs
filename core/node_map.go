@@ -3,6 +3,8 @@ package core
 import (
 	"feishu2mkdocs/utils"
 	"fmt"
+	"os"
+	"encoding/json"
 
 	larkwiki "github.com/larksuite/oapi-sdk-go/v3/service/wiki/v2"
 )
@@ -28,6 +30,28 @@ func NewNodeMap() *NodeMap {
 		FileNameCount: make(map[string]int),
 		Entries: make([]string, 0),
 	}
+}
+
+func (m *NodeMap) ReadFromFile (path string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	if  err := json.Unmarshal(data, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *NodeMap) SaveFile (path string) error {
+	data, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (m *NodeMap) AddNode (node *larkwiki.Node, path string, isShortCut bool) error {
