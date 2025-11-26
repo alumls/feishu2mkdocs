@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-
+	
+	"path/filepath"
 	"feishu2mkdocs/utils"
 
 	larkdocx "github.com/larksuite/oapi-sdk-go/v3/service/docx/v1"
@@ -16,6 +17,7 @@ import (
 type Parser struct {
 	ImgTokens []string
 	blockMap  map[string]*larkdocx.Block
+	currentNodeToken string
 	nodeMap *NodeMap
 	config OutputConfig
 }
@@ -45,7 +47,7 @@ func (p *Parser) ParseDocxsContent(node *larkwiki.Node, blocks []*larkdocx.Block
 			node,
 		)
 	}
-
+	p.currentNodeToken = *node.NodeToken
 	for _, block := range blocks {
 		if utils.IsNilPointer(block) {
 			return "", fmt.Errorf(
@@ -386,10 +388,10 @@ func (p *Parser) ParseDocxTextElementMentionDoc(md *larkdocx.MentionDoc) string 
 	if p.nodeMap == nil {
 		buf.WriteString(fmt.Sprintf("[%s](%s)", *md.Title, utils.UnescapeURL(*md.Url)))
 	} else if nodeMeta, ok := p.nodeMap.NodeMeta[*md.Token]; ok {
-		path := strings.TrimPrefix(nodeMeta.Path, p.config.DocsDir + "/")
+		path, _ := filepath.Rel(p.nodeMap.NodeMeta[p.currentNodeToken].Dir, nodeMeta.Path)
 		fmt.Println(path)
 		fmt.Println(nodeMeta.Path)
-		fmt.Println(p.config.DocsDir + "/")
+		fmt.Println(p.nodeMap.NodeMeta[p.currentNodeToken].Dir)
 		buf.WriteString(fmt.Sprintf("[%s](%s)", *md.Title, path))
 	} else {
 		buf.WriteString(fmt.Sprintf("[%s](%s)", *md.Title, utils.UnescapeURL(*md.Url)))
