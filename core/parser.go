@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	
-	"path/filepath"
+
 	"feishu2mkdocs/utils"
+	"path/filepath"
 
 	larkdocx "github.com/larksuite/oapi-sdk-go/v3/service/docx/v1"
 	larkwiki "github.com/larksuite/oapi-sdk-go/v3/service/wiki/v2"
@@ -15,11 +15,11 @@ import (
 // TODO: 由于feishu和mkdocs的解析器差异，有些语法并不能在mkdocs中得到支持，但是目前Parser没有做这一层的处理，如果出些不支持的语法，应该给出相应的警告。
 
 type Parser struct {
-	ImgTokens []string
-	blockMap  map[string]*larkdocx.Block
+	ImgTokens        []string
+	blockMap         map[string]*larkdocx.Block
 	currentNodeToken string
-	nodeMap *NodeMap
-	config OutputConfig
+	nodeMap          *NodeMap
+	config           OutputConfig
 }
 
 // NewParser: 创建一个Parser实例。
@@ -30,8 +30,8 @@ func NewParser(config OutputConfig, nodeMap *NodeMap) *Parser {
 	return &Parser{
 		ImgTokens: make([]string, 0),
 		blockMap:  make(map[string]*larkdocx.Block),
-		nodeMap: nodeMap,
-		config: config,
+		nodeMap:   nodeMap,
+		config:    config,
 	}
 }
 
@@ -176,7 +176,7 @@ func (p *Parser) ParseDocxBlockOrdered(b *larkdocx.Block, indentLevel int) strin
 	order := 1
 	for idx, child := range parent.Children {
 		if child == *b.BlockId {
-			for i := idx-1; i >=0; i-- {
+			for i := idx - 1; i >= 0; i-- {
 				if *p.blockMap[parent.Children[i]].BlockType == DocxBlockTypeOrdered {
 					order++
 				} else {
@@ -203,9 +203,9 @@ func (p *Parser) ParseDocxBlockBullet(b *larkdocx.Block, indentLevel int) string
 	buf.WriteString("- ")
 	buf.WriteString(p.ParseDocxBlockText(b.Bullet))
 
-	for _, childId := range b.Children{
+	for _, childId := range b.Children {
 		childBlock := p.blockMap[childId]
-		buf.WriteString(p.ParseDocxBlock(childBlock, indentLevel + 1))
+		buf.WriteString(p.ParseDocxBlock(childBlock, indentLevel+1))
 	}
 
 	return buf.String()
@@ -216,14 +216,14 @@ func (p *Parser) ParseDocxBlockTodo(b *larkdocx.Block, indentLevel int) string {
 
 	if *b.Todo.Style.Done {
 		buf.WriteString("- [x] ")
-	} else{
+	} else {
 		buf.WriteString("- [ ] ")
 	}
 	buf.WriteString(p.ParseDocxBlockText(b.Todo))
 
 	for _, childId := range b.Children {
 		childBlock := p.blockMap[childId]
-		buf.WriteString(p.ParseDocxBlock(childBlock, indentLevel + 1))
+		buf.WriteString(p.ParseDocxBlock(childBlock, indentLevel+1))
 	}
 
 	return buf.String()
@@ -254,7 +254,7 @@ func (p *Parser) ParseDocxBlockQuote(b *larkdocx.Block) string {
 
 	s := buf.String()
 
-	newPart := s[startIndex: len(s)-2]
+	newPart := s[startIndex : len(s)-2]
 
 	processed := new(strings.Builder)
 	for i := 0; i < len(newPart); i++ {
@@ -277,7 +277,7 @@ func (p *Parser) ParseDocxBlockCallout(b *larkdocx.Block) string {
 		calloutType = newCalloutType
 	}
 
-	buf.WriteString("!!! "+ calloutType + "\n\n    ")
+	buf.WriteString("!!! " + calloutType + "\n\n    ")
 
 	startIndex := buf.Len()
 
@@ -289,7 +289,7 @@ func (p *Parser) ParseDocxBlockCallout(b *larkdocx.Block) string {
 
 	s := buf.String()
 
-	newPart := s[startIndex: len(s)-2]
+	newPart := s[startIndex : len(s)-2]
 
 	processed := new(strings.Builder)
 	for i := 0; i < len(newPart); i++ {
@@ -387,11 +387,11 @@ func (p *Parser) ParseDocxTextElementMentionDoc(md *larkdocx.MentionDoc) string 
 	}
 	if p.nodeMap == nil {
 		buf.WriteString(fmt.Sprintf("[%s](%s)", *md.Title, utils.UnescapeURL(*md.Url)))
-	} else if nodeMeta, ok := p.nodeMap.NodeMeta[*md.Token]; ok {
-		path, _ := filepath.Rel(p.nodeMap.NodeMeta[p.currentNodeToken].Dir, nodeMeta.Path)
+	} else if nodeMeta, ok := p.nodeMap.Meta[*md.Token]; ok {
+		path, _ := filepath.Rel(p.nodeMap.Meta[p.currentNodeToken].Dir, nodeMeta.Path)
 		fmt.Println(path)
 		fmt.Println(nodeMeta.Path)
-		fmt.Println(p.nodeMap.NodeMeta[p.currentNodeToken].Dir)
+		fmt.Println(p.nodeMap.Meta[p.currentNodeToken].Dir)
 		buf.WriteString(fmt.Sprintf("[%s](%s)", *md.Title, path))
 	} else {
 		buf.WriteString(fmt.Sprintf("[%s](%s)", *md.Title, utils.UnescapeURL(*md.Url)))
