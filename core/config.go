@@ -1,11 +1,5 @@
 package core
 
-import (
-	"os"
-
-	"gopkg.in/yaml.v3"
-)
-
 // Future output options may include:
 // 	- StartHeading
 // 	- MaxHeading
@@ -45,22 +39,4 @@ func NewConfig(appId, appSecret, spaceId string) *Config {
 			DocsDir: "docs",
 		},
 	}
-}
-// ReadFromConfigFile: 从配置文件中读取配置。
-//
-// 参数：
-//   - path: 配置文件的路径
-func ReadFromConfigFile(path string) (*Config, error) {
-	data, err := os.ReadFile(path)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var cfg Config
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return nil, err
-	}
-
-	return &cfg, nil
 }
